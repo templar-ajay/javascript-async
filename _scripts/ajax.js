@@ -2,14 +2,16 @@
 let httpRequest = new XMLHttpRequest();
 
 // add get() function here
-function get(url, success, fail) {
-  httpRequest.open("GET", url);
-  httpRequest.onload = () => {
-    httpRequest.status === 200
-      ? success(httpRequest.responseText)
-      : fail(httpRequest.status);
-  };
-  httpRequest.send();
+function get(url) {
+  return new Promise((resolve, reject) => {
+    httpRequest.open("GET", url);
+    httpRequest.onload = () => {
+      httpRequest.status === 200
+        ? resolve(httpRequest.responseText)
+        : reject(Error(httpRequest.status));
+    };
+    httpRequest.send();
+  });
 }
 
 function tempToF(kelvin) {
@@ -49,11 +51,13 @@ function failHandler(status) {
 
 document.addEventListener("DOMContentLoaded", function () {
   const apiKey = "07ebd59e1632937e4c8edff407b3e123"; // ADD YOUR API KEY BETWEEN THE QUOTES
+  // const apiKey = "";
 
   const url =
     "https://api.openweathermap.org/data/2.5/weather?q=los+angeles&APPID=" +
     apiKey;
   // add get() function call here
-  get(url, successHandler, failHandler);
   // successHandler(httpRequest.responseText); // instead use callback in get function
+  // get(url, successHandler, failHandler);
+  console.log(get(url));
 });
