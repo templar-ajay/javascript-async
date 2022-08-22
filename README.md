@@ -151,5 +151,55 @@ to make async/await code backwards compatible use babel.io to first transpile th
 ![web worker working](images/web%20worker%20working.png)
 
 ```js
-const worker = new Worker(script);
+const worker = new Worker(script_path);
+```
+
+passing data to the worker
+
+```js
+// code on script.js
+
+const worker = new Worker(./web_worker.js);
+
+worker.postMessage("hello worker");
+worker.postMessage({
+  name: "ajay",
+  feeling: "low",
+  drivingLicense: false,
+});
+console.log('message sent to worker')
+
+
+// code on web_worker.js to receive message
+
+this.addEventListener("message",(event)=>{
+  console.log("message received from main script")
+  console.log(event.data)
+})
+
+```
+
+output
+
+```txt
+message sent to worker
+message recieved from main script
+hello worker
+message received from main script
+{name:"ajay",feeling:"low",drivingLicense:false}
+```
+
+Receiving output message from web worker
+
+```js
+// code in webWorker.js
+
+this.postMessage(result);
+
+// code in script.js
+const worker = new Worker(webWorker.js);
+worker.addEventListener("message", (event) => {
+  const receivedData = event.data;
+  console.log(receivedData, "received from the worker");
+});
 ```

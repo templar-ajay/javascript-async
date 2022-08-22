@@ -1,8 +1,8 @@
 function get(url) {
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     let httpRequest = new XMLHttpRequest();
-    httpRequest.open('GET', url);
-    httpRequest.onload = function() {
+    httpRequest.open("GET", url);
+    httpRequest.onload = function () {
       if (httpRequest.status === 200) {
         // Resolve the promise with the response text
         // success(httpRequest.responseText);
@@ -15,8 +15,8 @@ function get(url) {
     };
 
     // Handle network errors
-    httpRequest.onerror = function() {
-      reject(Error('Network Error'));
+    httpRequest.onerror = function () {
+      reject(Error("Network Error"));
     };
 
     httpRequest.send();
@@ -52,18 +52,18 @@ function tempToF(kelvin) {
   return ((kelvin - 273.15) * 1.8 + 32).toFixed(0);
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-  const apiKey = ''; // ADD YOUR API KEY BETWEEN THE QUOTES
+document.addEventListener("DOMContentLoaded", function () {
+  const apiKey = "07ebd59e1632937e4c8edff407b3e123"; // ADD YOUR API KEY BETWEEN THE QUOTES
   //const apiKey = '';
-  const weatherDiv = document.querySelector('#weather');
+  const weatherDiv = document.querySelector("#weather");
 
   const locations = [
-    'los+angeles,us',
-    'san+francisco,us',
-    'lone+pine,us',
-    'mariposa,us'
+    "los+angeles,us",
+    "san+francisco,us",
+    "lone+pine,us",
+    "mariposa,us",
   ];
-  const urls = locations.map(function(location) {
+  const urls = locations.map(function (location) {
     return `https://api.openweathermap.org/data/2.5/weather?q=${location}&APPID=${apiKey}`;
   });
 
@@ -84,21 +84,21 @@ document.addEventListener('DOMContentLoaded', function() {
   //     weatherDiv.classList.remove('hidden');
   //   });
 
-  (async function() {
+  (async function () {
     try {
       let responses = [];
       responses.push(await get(urls[0]));
       responses.push(await get(urls[1]));
       responses.push(await get(urls[2]));
       responses.push(await get(urls[3]));
-      let literals = responses.map(function(response) {
+      let literals = responses.map(function (response) {
         return successHandler(response);
       });
-      weatherDiv.innerHTML = `<h1>Weather</h1>${literals.join('')}`;
+      weatherDiv.innerHTML = `<h1>Weather</h1>${literals.join("")}`;
     } catch (status) {
       failHandler(status);
     } finally {
-      weatherDiv.classList.remove('hidden');
+      weatherDiv.classList.remove("hidden");
     }
   })();
 });

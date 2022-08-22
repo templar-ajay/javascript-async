@@ -1,9 +1,11 @@
-'use strict';
+"use strict";
 
 const delay = (ms) => {
-  const startPoint = new Date().getTime()
-  while (new Date().getTime() - startPoint <= ms) {/* wait */}
-}
+  const startPoint = new Date().getTime();
+  while (new Date().getTime() - startPoint <= ms) {
+    /* wait */
+  }
+};
 
 const grayscaleImage = (pixels) => {
   var d = pixels.data;
@@ -14,7 +16,7 @@ const grayscaleImage = (pixels) => {
     // CIE luminance for the RGB
     // The human eye is bad at seeing red and blue, so we de-emphasize them.
     var v = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-    d[i] = d[i + 1] = d[i + 2] = v
+    d[i] = d[i + 1] = d[i + 2] = v;
   }
   delay(1000);
   return pixels;
@@ -32,14 +34,14 @@ const brightnessImage = (adjustment, pixels) => {
 };
 
 const thresholdImage = (level, pixelData) => {
-  const thresholdLevel = level;    // 0-255
+  const thresholdLevel = level; // 0-255
   var d = pixelData.data;
   for (var i = 0; i < d.length; i += 4) {
     var r = d[i];
     var g = d[i + 1];
     var b = d[i + 2];
-    var v = (0.2126 * r + 0.7152 * g + 0.0722 * b >= thresholdLevel) ? 255 : 0;
-    d[i] = d[i + 1] = d[i + 2] = v
+    var v = 0.2126 * r + 0.7152 * g + 0.0722 * b >= thresholdLevel ? 255 : 0;
+    d[i] = d[i + 1] = d[i + 2] = v;
   }
   delay(1000);
   return pixelData;
@@ -48,14 +50,26 @@ const thresholdImage = (level, pixelData) => {
 const applyFilter = (filter, level, image) => {
   const startTime = new Date().getTime();
   let results;
-  if (filter === 'brightness') {
+  if (filter === "brightness") {
     results = brightnessImage(level, image);
-  } else if (filter === 'threshold') {
+  } else if (filter === "threshold") {
     results = thresholdImage(level, image);
-  } else if (filter === 'grayscale') {
+  } else if (filter === "grayscale") {
     results = grayscaleImage(image);
   }
   const totalTime = new Date().getTime() - startTime;
   console.log("Filtering: %d ms", totalTime);
   return results;
 };
+
+this.addEventListener("message", (event) => {
+  // console.log(`Message received from main script`);
+  // console.log(event.data);
+  const workerResult = applyFilter(
+    event.data.filter,
+    event.data.level,
+    event.data.image
+  );
+  // console.log(`workerResult`, workerResult);
+  this.postMessage(workerResult);
+});
