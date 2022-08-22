@@ -1,27 +1,32 @@
-// add global variable containing XHR object here
-let httpRequest = new XMLHttpRequest();
-
-// add get() function here
 function get(url) {
-  return new Promise((resolve, reject) => {
-    httpRequest.open("GET", url);
-    httpRequest.onload = () => {
-      httpRequest.status === 200
-        ? resolve(httpRequest.responseText)
-        : reject(Error(httpRequest.status));
+  return new Promise(function(resolve, reject) {
+    let httpRequest = new XMLHttpRequest();
+    httpRequest.open('GET', url);
+    httpRequest.onload = function() {
+      if (httpRequest.status === 200) {
+        // Resolve the promise with the response text
+        // success(httpRequest.responseText);
+        resolve(httpRequest.response);
+      } else {
+        // Reject the promise with the status text
+        // fail(httpRequest.status);
+        reject(Error(httpRequest.statusText));
+      }
     };
+
+    // Handle network errors
+    httpRequest.onerror = function() {
+      reject(Error('Network Error'));
+    };
+
     httpRequest.send();
   });
 }
 
-function tempToF(kelvin) {
-  return ((kelvin - 273.15) * 1.8 + 32).toFixed(0);
-}
-
 function successHandler(data) {
   const dataObj = JSON.parse(data);
+  // const weatherDiv = document.querySelector('#weather');
   const div = `
-        <h1>Weather</h1>
         <h2 class="top">
         <img
             src="http://openweathermap.org/img/w/${dataObj.weather[0].icon}.png"
@@ -31,76 +36,69 @@ function successHandler(data) {
         />${dataObj.name}
         </h2>
         <p>
-        <span class="tempF">${tempToF(dataObj.main.temp)}&deg;</span> | ${
-    dataObj.weather[0].description
-  }
+          <span class="tempF">${tempToF(dataObj.main.temp)}&deg;</span> | 
+          ${dataObj.weather[0].description}
         </p>
     `;
   return div;
+  // weatherDiv.innerHTML = weatherFragment;
 }
 
 function failHandler(status) {
-  console.error(status, "error occurred while fetching data from server");
-
-  weatherDiv.classList.remove("hidden");
+  console.log(status);
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-  const apiKey = "07ebd59e1632937e4c8edff407b3e123"; // ADD YOUR API KEY BETWEEN THE QUOTES
-  // const apiKey = "";
-  const weatherDiv = document.querySelector("#weather");
+function tempToF(kelvin) {
+  return ((kelvin - 273.15) * 1.8 + 32).toFixed(0);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const apiKey = ''; // ADD YOUR API KEY BETWEEN THE QUOTES
+  //const apiKey = '';
+  const weatherDiv = document.querySelector('#weather');
 
   const locations = [
-    "los+angeles,us",
-    "san+francisco,us",
-    "lone+pine,us",
-    "mariposa,us",
+    'los+angeles,us',
+    'san+francisco,us',
+    'lone+pine,us',
+    'mariposa,us'
   ];
-
-  // const url =
-  //   "https://api.openweathermap.org/data/2.5/weather?q=los+angeles&APPID=" +
-  //   apiKey;
-
-  const urls = locations.map((location) => {
+  const urls = locations.map(function(location) {
     return `https://api.openweathermap.org/data/2.5/weather?q=${location}&APPID=${apiKey}`;
   });
-  // add get() function call here
-  // successHandler(httpRequest.responseText); // instead use callback in get function
-  // get(url, successHandler, failHandler);
-  // console.log(get(url));
 
+  // get(url, successHandler, failHandler);
   // Promise.all([get(urls[0]), get(urls[1]), get(urls[2]), get(urls[3])])
-  //   .then((responses) => {
-  //     return responses.map((response) => {
+  //   .then(function(responses) {
+  //     return responses.map(function(response) {
   //       return successHandler(response);
   //     });
   //   })
-  //   .then((literals) => {
-  //     weatherDiv.innerHTML = `<h1>Weather</h1>${literals.join("")}`;
+  //   .then(function(literals) {
+  //     weatherDiv.innerHTML = `<h1>Weather</h1>${literals.join('')}`;
   //   })
-  //   .catch((err) => {
-  //     console.error(err);
+  //   .catch(function(status) {
+  //     failHandler(status);
   //   })
-  //   .finally(() => {
-  //     weatherDiv.classList.remove("hidden");
+  //   .finally(function() {
+  //     weatherDiv.classList.remove('hidden');
   //   });
 
-  (async () => {
+  (async function() {
     try {
-      const responses = [];
+      let responses = [];
       responses.push(await get(urls[0]));
       responses.push(await get(urls[1]));
       responses.push(await get(urls[2]));
       responses.push(await get(urls[3]));
-
-      let literals = responses.map((response) => {
+      let literals = responses.map(function(response) {
         return successHandler(response);
       });
-      weatherDiv.innerHTML = `<h1>Weather</h1>${literals.join("")}`;
+      weatherDiv.innerHTML = `<h1>Weather</h1>${literals.join('')}`;
     } catch (status) {
-      failHandler(`error status code ${status}`);
+      failHandler(status);
     } finally {
-      weatherDiv.classList.remove("hidden");
+      weatherDiv.classList.remove('hidden');
     }
   })();
 });
