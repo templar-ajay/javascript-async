@@ -92,3 +92,64 @@ cdn -
 ```html
 <script src="https://cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.min.js"></script>
 ```
+
+# async/await
+
+- syntactic sugar for promises
+
+```js
+(async () => {
+  const responses = [];
+  responses.push(await fetch(urls[0]));
+  responses.push(await fetch(urls[1]));
+  responses.push(await fetch(urls[2]));
+  responses.push(await fetch(urls[3]));
+
+  const jsonData = responses.map((response) => {
+    return response.json();
+  });
+
+  console.log(jsonData.join(","));
+})();
+```
+
+## Error handling in async/await
+
+```js
+(async () => {
+  try {
+    const responses = [];
+    responses.push(await fetch(urls[0]));
+    responses.push(await fetch(urls[1]));
+    responses.push(await fetch(urls[2]));
+    responses.push(await fetch(urls[3]));
+
+    const jsonData = responses.map((response) => {
+      return response.json();
+    });
+
+    console.log(jsonData.join(","));
+  } catch (status) {
+    // will catch errors
+    console.error(`error status code ${status}`);
+  } finally {
+    // will execute the commands irrespective of success or errors
+    console.log("all fetch request have returned results");
+  }
+})();
+```
+
+## Making async/await backwards compatible
+
+to make async/await code backwards compatible use babel.io to first transpile the code in form of promises and then insert that transpiled code in in our project and use polyfill to make it more backwards compatible , by inserting polyfill cdn in html before the script that uses promises
+
+# Web Workers
+
+- use their own thread to process.
+- make code asynchronous , make app do multiple things at once by leveraging the multiple processor threads
+
+![web worker working](images/web%20worker%20working.png)
+
+```js
+const worker = new Worker(script);
+```

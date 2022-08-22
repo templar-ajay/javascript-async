@@ -69,19 +69,38 @@ document.addEventListener("DOMContentLoaded", function () {
   // get(url, successHandler, failHandler);
   // console.log(get(url));
 
-  Promise.all([get(urls[0]), get(urls[1]), get(urls[2]), get(urls[3])])
-    .then((responses) => {
-      return responses.map((response) => {
+  // Promise.all([get(urls[0]), get(urls[1]), get(urls[2]), get(urls[3])])
+  //   .then((responses) => {
+  //     return responses.map((response) => {
+  //       return successHandler(response);
+  //     });
+  //   })
+  //   .then((literals) => {
+  //     weatherDiv.innerHTML = `<h1>Weather</h1>${literals.join("")}`;
+  //   })
+  //   .catch((err) => {
+  //     console.error(err);
+  //   })
+  //   .finally(() => {
+  //     weatherDiv.classList.remove("hidden");
+  //   });
+
+  (async () => {
+    try {
+      const responses = [];
+      responses.push(await get(urls[0]));
+      responses.push(await get(urls[1]));
+      responses.push(await get(urls[2]));
+      responses.push(await get(urls[3]));
+
+      let literals = responses.map((response) => {
         return successHandler(response);
       });
-    })
-    .then((literals) => {
       weatherDiv.innerHTML = `<h1>Weather</h1>${literals.join("")}`;
-    })
-    .catch((err) => {
-      console.error(err);
-    })
-    .finally(() => {
+    } catch (status) {
+      failHandler(`error status code ${status}`);
+    } finally {
       weatherDiv.classList.remove("hidden");
-    });
+    }
+  })();
 });
